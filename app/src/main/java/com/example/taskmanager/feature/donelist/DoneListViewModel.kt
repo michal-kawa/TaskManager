@@ -1,10 +1,10 @@
 package com.example.taskmanager.feature.donelist
 
-import androidx.compose.runtime.MutableState
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.taskmanager.core.common.TaskListViewModel
 import com.example.taskmanager.core.data.model.Task
+import com.example.taskmanager.core.data.model.TaskStatus
 import com.example.taskmanager.core.data.repository.TaskRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DoneListViewModel @Inject constructor(
     private val taskRepository: TaskRepository
-) : ViewModel() {
+) : ViewModel(), TaskListViewModel {
 
     private var _uiState = MutableStateFlow(DoneListUiState())
     val uiState: StateFlow<DoneListUiState> = _uiState.asStateFlow()
@@ -27,9 +27,26 @@ class DoneListViewModel @Inject constructor(
         refreshTaskList()
     }
 
-    private fun refreshTaskList() {
+    override fun refreshTaskList() {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(listOfTasks = taskRepository.getDoneTaskList()) }
+        }
+    }
+
+    override fun removeTask(task: Task) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val taskToDelete = uiState.value.listOfTasks.find { it.id == task.id }!!
+            taskRepository.removeTask(taskToDelete)
+        }
+    }
+
+    override fun updateTaskStatus(task: Task, newStatus: TaskStatus) {
+        val taskToUpdate = _uiState.value.listOfTasks.find { it.id == task.id }
+        if (taskToUpdate != null) {
+            viewModelScope.launch(Dispatchers.IO) {
+                taskRepository.updateTaskStatus(task.copy(taskStatus = newStatus))
+            }
+            refreshTaskList()
         }
     }
 }

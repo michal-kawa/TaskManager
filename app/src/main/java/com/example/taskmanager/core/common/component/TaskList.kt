@@ -1,182 +1,186 @@
 package com.example.taskmanager.core.common.component
 
+import android.content.res.Resources
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.DismissDirection
+import androidx.compose.material.DismissState
 import androidx.compose.material.DismissValue
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FractionalThreshold
+import androidx.compose.material.Icon
 import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.rememberDismissState
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LiveData
+import com.example.taskmanager.R
+import com.example.taskmanager.core.common.TaskListViewModel
 import com.example.taskmanager.core.data.model.Task
 import com.example.taskmanager.core.data.model.TaskStatus
+import com.example.taskmanager.core.data.model.getNextStatus
+import com.example.taskmanager.core.data.model.getPreviousStatus
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun TaskList(
     tasks: List<Task>,
-    moveTask: (Int, TaskStatus) -> Unit,
-    removeTask: () -> Unit
+    viewModel: TaskListViewModel
 ) {
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        this.items(tasks) { task ->
-            val dismissState = rememberDismissState(
-                confirmStateChange = {
-                    if (it == DismissValue.DismissedToStart) {
-                        removeTask()
+    val lazyListState = rememberLazyListState()
+
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        state = lazyListState
+    ) {
+        items(
+            items = tasks,
+            key = { task -> task.id },
+            itemContent = { item ->
+                val currentItem by rememberUpdatedState(item)
+                val dismissState = rememberDismissState(
+                    confirmStateChange = {
+                        when(it) {
+                            DismissValue.DismissedToStart -> {
+                                swipeEndToStartFunctionality(currentItem, viewModel)
+                                true
+                            }
+                            DismissValue.DismissedToEnd -> {
+                                swipeStartToEndFunctionality(currentItem, viewModel)
+                                true
+                            }
+                            else -> false
+                        }
                     }
-                    if (it == DismissValue.DismissedToEnd) {
-                        var nextStatus = getNextStatus(task)
-                        moveTask(task.id, nextStatus)
-                    }
-                    true
+                )
+
+                if (dismissState.isDismissed(DismissDirection.EndToStart)) {
+                    swipeEndToStartFunctionality(currentItem, viewModel)
                 }
-            )
-            SwipeToDismiss(
-                state = dismissState,
-                background = {
-                    val color = when (dismissState.dismissDirection) {
-                        DismissDirection.StartToEnd -> Color.Green
-                        DismissDirection.EndToStart -> Color.Red
-                        null -> Color.Transparent
+
+                if (dismissState.isDismissed(DismissDirection.StartToEnd)) {
+                    swipeStartToEndFunctionality(currentItem, viewModel)
+                }
+
+                SwipeToDismiss(
+                    state = dismissState,
+                    modifier = Modifier
+                        .padding(vertical = 1.dp)
+                        .animateItemPlacement(),
+                    directions = setOf(
+                        DismissDirection.StartToEnd,
+                        DismissDirection.EndToStart
+                    ),
+                    dismissThresholds = {
+                        FractionalThreshold( 0.2f)
+                    },
+                    background = {
+                        SwipeBackground(item, dismissState)
+                    },
+                    dismissContent = {
+                        TaskItem(task = item)
                     }
-                    val direction = dismissState.dismissDirection
-
-                    if (direction == DismissDirection.StartToEnd) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(color)
-                                .padding(8.dp)
-                        ) {
-                            Column(modifier = Modifier.align(Alignment.CenterStart)) {
-                                Icon(
-                                    imageVector = Icons.Default.ArrowForward,
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                                )
-                                Text(
-                                    text = "Move to Archive", fontWeight = FontWeight.Bold,
-                                    textAlign = TextAlign.Center,
-                                    color = Color.White
-                                )
-                            }
-
-                        }
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(color)
-                                .padding(8.dp)
-                        ) {
-                            Column(modifier = Modifier.align(Alignment.CenterEnd)) {
-                                Icon(
-                                    imageVector = Icons.Default.ArrowBack,
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                                )
-                                Spacer(modifier = Modifier.heightIn(5.dp))
-                                Text(
-                                    text = "Move to Bin",
-                                    textAlign = TextAlign.Center,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.LightGray
-                                )
-
-                            }
-                        }
-                    }
-                },
-//                background = {
-//                    val direction = dismissState.dismissDirection ?: return@SwipeToDismiss
-//
-//                    var nextStatus = getNextStatus(task)
-//                    var previousStatus = getPreviousStatus(task)
-//
-//                    val alignment = when (direction) {
-//                        DismissDirection.EndToStart -> Alignment.CenterEnd
-//                        DismissDirection.StartToEnd -> Alignment.CenterStart
-//                    }
-//
-//                    val text = when (direction) {
-//                        DismissDirection.EndToStart -> if (task.taskStatus == TaskStatus.TODO) {
-//                            Text(text = "Remove")
-//                        } else {
-//                            Text(text = "Move to $previousStatus")
-//                        }
-//
-//                        DismissDirection.StartToEnd -> if (task.taskStatus == TaskStatus.DONE) {
-//                            Text(text = "Remove")
-//                        } else {
-//                            Text(text = "Move to $nextStatus")
-//                        }
-//                    }
-//
-//                    Box(
-//                        modifier = Modifier
-//                            .fillMaxSize()
-//                            .background(Color.Cyan)
-//                            .padding(12.dp),
-//                        contentAlignment = alignment
-//                    ) {
-//                        text
-//                    }
-//                }
-            ) {
-                ToDoTaskItem(task = task)
+                )
             }
+        )
+    }
+}
+
+fun swipeEndToStartFunctionality(task: Task, viewModel: TaskListViewModel) {
+    when(task.taskStatus) {
+        TaskStatus.TODO -> viewModel.removeTask(task)
+        TaskStatus.IN_PROGRESS -> viewModel.updateTaskStatus(task, TaskStatus.TODO)
+        TaskStatus.DONE -> viewModel.updateTaskStatus(task, TaskStatus.IN_PROGRESS)
+    }
+    viewModel.refreshTaskList()
+}
+
+fun swipeStartToEndFunctionality(task: Task, viewModel: TaskListViewModel) {
+    when(task.taskStatus) {
+        TaskStatus.TODO -> viewModel.updateTaskStatus(task, TaskStatus.IN_PROGRESS)
+        TaskStatus.IN_PROGRESS -> viewModel.updateTaskStatus(task, TaskStatus.DONE)
+        TaskStatus.DONE -> viewModel.removeTask(task)
+    }
+    viewModel.refreshTaskList()
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun SwipeBackground(task: Task, dismissState: DismissState) {
+
+    val nextStatus = task.getNextStatus()
+    val previousStatus = task.getPreviousStatus()
+
+    val mapOfStatus = mapOf(
+        TaskStatus.TODO to ImageVector.vectorResource(id = R.drawable.todo_icon),
+        TaskStatus.IN_PROGRESS to ImageVector.vectorResource(R.drawable.inprogress_icon),
+        TaskStatus.DONE to ImageVector.vectorResource(R.drawable.done_icon),
+    )
+
+    val direction = dismissState.dismissDirection ?: return
+    val color by animateColorAsState(
+        when (dismissState.targetValue) {
+            DismissValue.Default -> Color.LightGray
+            DismissValue.DismissedToEnd -> if(nextStatus != null) Color.Green else Color.Red
+            DismissValue.DismissedToStart -> if(previousStatus != null) Color.Green else Color.Red
+        }, label = ""
+    )
+    val alignment = when (direction) {
+        DismissDirection.StartToEnd -> Alignment.CenterStart
+        DismissDirection.EndToStart -> Alignment.CenterEnd
+    }
+    val icon = when (direction) {
+        DismissDirection.StartToEnd -> mapOfStatus[nextStatus] ?: Icons.Default.Delete
+        DismissDirection.EndToStart -> mapOfStatus[previousStatus] ?: Icons.Default.Delete
+    }
+    val scale by animateFloatAsState(
+        if (dismissState.targetValue == DismissValue.Default) 0f else 1f,
+        label = ""
+    )
+
+    val text = when (direction) {
+        DismissDirection.StartToEnd -> if(nextStatus != null) "Move to " else "Remove "
+        DismissDirection.EndToStart -> if(previousStatus != null) "Move to " else "Remove "
+    }
+
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(color)
+            .padding(horizontal = 20.dp),
+        contentAlignment = alignment
+    ) {
+        Row {
+            Text(
+                text,
+                modifier = Modifier.scale(scale))
+            Icon(
+                icon,
+                contentDescription = "Icon",
+                modifier = Modifier.scale(scale)
+            )
         }
     }
-}
-
-@Composable
-fun ToDoTaskItem(task: Task) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Text(task.title)
-        Text(task.description)
-        Text(task.createDate)
-    }
-}
-
-fun getNextStatus(task: Task): TaskStatus = when (task.taskStatus) {
-    TaskStatus.TODO -> TaskStatus.IN_PROGRESS
-    TaskStatus.IN_PROGRESS -> TaskStatus.DONE
-    else -> TaskStatus.DONE
-}
-
-fun getPreviousStatus(task: Task): TaskStatus = when (task.taskStatus) {
-    TaskStatus.IN_PROGRESS -> TaskStatus.TODO
-    TaskStatus.DONE -> TaskStatus.IN_PROGRESS
-    else -> TaskStatus.TODO
 }

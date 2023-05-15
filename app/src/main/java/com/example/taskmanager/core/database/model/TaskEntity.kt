@@ -7,7 +7,7 @@ import com.example.taskmanager.core.data.model.TaskStatus
 
 @Entity(tableName = "task")
 data class TaskEntity(
-    @PrimaryKey val id: Int,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val title: String,
     val description: String,
     val createDate: String,

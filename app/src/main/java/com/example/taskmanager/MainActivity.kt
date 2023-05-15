@@ -60,7 +60,7 @@ fun MainScreen() {
     val bottomBarState = rememberSaveable { (mutableStateOf(true)) }
     val floatingButtonState = rememberSaveable { (mutableStateOf(true)) }
 
-    when (backStackEntry?.value?.destination?.route) {
+    when (backStackEntry.value?.destination?.route) {
         Screen.Todo.route, Screen.Inprogress.route, Screen.Done.route -> {
             bottomBarState.value = true
             floatingButtonState.value = true

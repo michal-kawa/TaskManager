@@ -3,6 +3,7 @@ package com.example.taskmanager.feature.inprogresslist
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.taskmanager.core.common.TaskListViewModel
 import com.example.taskmanager.core.data.model.Task
 import com.example.taskmanager.core.data.model.TaskStatus
 import com.example.taskmanager.core.data.repository.TaskRepository
@@ -19,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class InProgressListViewModel @Inject constructor(
     private val taskRepository: TaskRepository
-): ViewModel() {
+): ViewModel(), TaskListViewModel {
     private val _uiState = MutableStateFlow(InProgressListUiState())
     val uiState: StateFlow<InProgressListUiState> = _uiState.asStateFlow()
 
@@ -27,19 +28,26 @@ class InProgressListViewModel @Inject constructor(
         refreshTaskList()
     }
 
-    fun updateTaskStatus(taskId: Int, newStatus: TaskStatus) {
-        var task = _uiState.value.listOfTasks.find { it.id == taskId }
-        if (task != null) {
+    override fun refreshTaskList() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.update { it.copy(listOfTasks = taskRepository.getInProgressTaskList()) }
+        }
+    }
+
+    override fun removeTask(task: Task) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val taskToDelete = uiState.value.listOfTasks.find { it.id == task.id }!!
+            taskRepository.removeTask(taskToDelete)
+        }
+    }
+
+    override fun updateTaskStatus(task: Task, newStatus: TaskStatus) {
+        val taskToUpdate = _uiState.value.listOfTasks.find { it.id == task.id }
+        if (taskToUpdate != null) {
             viewModelScope.launch(Dispatchers.IO) {
                 taskRepository.updateTaskStatus(task.copy(taskStatus = newStatus))
             }
             refreshTaskList()
-        }
-    }
-
-    private fun refreshTaskList() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _uiState.update { it.copy(listOfTasks = taskRepository.getInProgressTaskList()) }
         }
     }
 }

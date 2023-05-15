@@ -11,5 +11,5 @@ import com.example.taskmanager.core.data.model.TaskStatus
 fun DoneListScreen(viewModel: DoneListViewModel = hiltViewModel()) {
     val tasks by viewModel.uiState.collectAsState()
 
-    TaskList(tasks.listOfTasks, moveTask = { _: Int, _: TaskStatus -> Unit }, {})
+    TaskList(tasks.listOfTasks, viewModel)
 }

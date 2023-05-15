@@ -27,6 +27,10 @@ class ImplTaskRepository @Inject constructor(private val taskDao: TaskDao) : Tas
 
     override suspend fun removeTask(task: Task) =
         taskDao.removeTask(task.asEntity())
+
+    override suspend fun addTask(task: Task) {
+        taskDao.insertTask(task.asEntity())
+    }
 }
 
 interface TaskRepository {
@@ -35,4 +39,5 @@ interface TaskRepository {
     fun getDoneTaskList(): List<Task>
     suspend fun updateTaskStatus(task: Task)
     suspend fun removeTask(task: Task)
+    suspend fun addTask(task: Task)
 }

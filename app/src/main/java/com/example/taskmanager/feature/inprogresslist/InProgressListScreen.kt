@@ -11,5 +11,5 @@ import com.example.taskmanager.core.common.component.TaskList
 fun InProgressListScreen(viewModel: InProgressListViewModel = hiltViewModel()) {
     val tasks by viewModel.uiState.collectAsState()
 
-    TaskList(tasks.listOfTasks, viewModel::updateTaskStatus, {})
+    TaskList(tasks.listOfTasks, viewModel)
 }
