@@ -1,13 +1,11 @@
 package com.example.taskmanager.feature.inprogresslist
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.taskmanager.core.common.TaskListViewModel
 import com.example.taskmanager.core.data.model.Task
 import com.example.taskmanager.core.data.model.TaskStatus
 import com.example.taskmanager.core.data.repository.TaskRepository
-import com.example.taskmanager.feature.todolist.TodoListUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
