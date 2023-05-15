@@ -100,7 +100,17 @@ fun MainScreen() {
 @Composable
 fun TaskManagerTopBar(navController: NavHostController, bottomBarState: MutableState<Boolean>) {
     TopAppBar(
-        title = { Text("Task Manager") },
+        title = {
+            if (navController.currentBackStackEntry?.destination?.route == Screen.Add.route){
+                Text(
+                    "Add New Task"
+                )
+            } else {
+                Text(
+                    "Task Manager"
+                )
+            }
+        },
         colors = TopAppBarDefaults.smallTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer
         ),
@@ -141,7 +151,7 @@ fun TaskNavigationBar(
 
 @Composable
 fun TaskManagerFloatingActionButton(navController: NavHostController) {
-    FloatingActionButton(onClick = { navController.navigate(Screen.Add.route) }) {
+    FloatingActionButton(onClick = { navController.navigate(Screen.Add.route) }, ) {
         Icon(Icons.Default.Add, "")
     }
 }

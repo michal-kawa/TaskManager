@@ -1,94 +1,139 @@
 package com.example.taskmanager.feature.addtask
 
-import android.app.DatePickerDialog
-import android.widget.DatePicker
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.TextField
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.taskmanager.core.data.model.Task
 import com.example.taskmanager.core.data.model.TaskStatus
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.marosseleng.compose.material3.datetimepickers.date.ui.dialog.DatePickerDialog
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun AddTaskScreen(viewModel: AddTaskViewModel = hiltViewModel()) {
 
     var taskName by remember { mutableStateOf("") }
     var taskDescription by remember { mutableStateOf("") }
 
-    val context = LocalContext.current
     val calendar = Calendar.getInstance()
+    val onBackPresserDispatcher =
+        LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
-    var selectedDateText by remember { mutableStateOf("") }
+    var nameIsEmpty by remember { mutableStateOf(false) }
+    var descriptionIsEmpty by remember { mutableStateOf(false) }
 
-// Fetching current year, month and day
-    var year = calendar[Calendar.YEAR]
-    var month = calendar[Calendar.MONTH]
-    var day = calendar[Calendar.DAY_OF_MONTH]
-    var date = remember { mutableStateOf("") }
+    var isDateDialogShown: Boolean by rememberSaveable {
+        mutableStateOf(false)
+    }
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        OutlinedTextField(
-            value = taskName,
-            onValueChange = { newName -> taskName = newName},
-            label = { Text("Name")},
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-        )
+    var selectedDate by remember { mutableStateOf("") }
+    val startingDate = LocalDate.now()
+        .format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
 
-        OutlinedTextField(
-            value = taskDescription,
-            onValueChange = { newDescription -> taskDescription = newDescription},
-            label = { Text("Description")},
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(120.dp),
-            minLines = 3,
-        )
 
-        val datePickerDialog = DatePickerDialog(
-            context,
-            {_: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
-                val corectMonthNumber = if(month + 1 < 10) {
-                    '0'+(month+1).toString()
-                } else {
-                    (month+1).toString()
-                }
-                selectedDateText = "$dayOfMonth.$corectMonthNumber.$year"
-            }, year, month, day
-        )
+    Scaffold(floatingActionButton = {
+        FloatingActionButton(onClick = {
 
-        Text(text = "Selected Date: $selectedDateText", Modifier.clickable { datePickerDialog.show() })
-
-        val onBackPresserDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-        Button(
-            onClick = {
+            if (!nameIsEmpty && !descriptionIsEmpty) {
                 viewModel.addNewTask(
-                    Task(0, taskName, taskDescription, selectedDateText, TaskStatus.TODO)
+                    Task(0, taskName, taskDescription, selectedDate, TaskStatus.TODO)
                 )
                 onBackPresserDispatcher?.onBackPressed()
             }
+        }) {
+            Icon(Icons.Default.Add, "")
+        }
+    }) {
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it)
+                .padding(16.dp)
         ) {
-            Text("Add new task")
+            OutlinedTextField(
+                value = taskName,
+                label = { Text("Name") },
+                onValueChange = { newName ->
+                    taskName = newName
+                    nameIsEmpty = !newName.matches(Regex("^(?=\\S*\\p{L})\\S+\$"))
+                },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                isError = nameIsEmpty,
+                supportingText = { Text(if (nameIsEmpty) "Name can't be empty" else "") }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = taskDescription,
+                label = { Text("Description") },
+                onValueChange = { newDescription ->
+                    taskDescription = newDescription
+                    descriptionIsEmpty = !newDescription.matches(Regex("^(?=\\S*\\p{L})\\S+\$"))
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp),
+                isError = descriptionIsEmpty,
+                supportingText = { Text(if (descriptionIsEmpty) "Description can't be empty" else "") }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = if (selectedDate == "") startingDate else selectedDate,
+                label = { Text("Date") },
+                onValueChange = { },
+                modifier = Modifier
+                    .fillMaxWidth(),
+                singleLine = true,
+                trailingIcon = {
+                    IconButton(onClick = { isDateDialogShown = true }) {
+                        Icon(Icons.Default.DateRange, contentDescription = "Date picker icon")
+                    }
+                }
+            )
+
+            if (isDateDialogShown) {
+                DatePickerDialog(
+                    onDismissRequest = { isDateDialogShown = false },
+                    onDateChange = {
+                        selectedDate = it.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                        isDateDialogShown = false
+                    },
+                    title = { Text("Select date") },
+                    initialDate = LocalDate.now()
+                )
+            }
         }
     }
 }
