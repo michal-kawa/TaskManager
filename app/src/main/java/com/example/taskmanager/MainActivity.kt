@@ -101,13 +101,13 @@ fun MainScreen() {
 fun TaskManagerTopBar(navController: NavHostController, bottomBarState: MutableState<Boolean>) {
     TopAppBar(
         title = {
-            if (navController.currentBackStackEntry?.destination?.route == Screen.Add.route){
+            if (navController.currentBackStackEntry?.destination?.route == Screen.Add.route) {
                 Text(
-                    "Add New Task"
+                    stringResource(R.string.add_new_task_topBar_title)
                 )
             } else {
                 Text(
-                    "Task Manager"
+                    stringResource(R.string.lists_topBar_title)
                 )
             }
         },
@@ -117,7 +117,7 @@ fun TaskManagerTopBar(navController: NavHostController, bottomBarState: MutableS
         navigationIcon = {
             if (!bottomBarState.value) {
                 IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.Default.ArrowBack, "Back button")
+                    Icon(Icons.Default.ArrowBack, stringResource(R.string.back_button_description))
                 }
             }
         }
@@ -141,7 +141,10 @@ fun TaskNavigationBar(
                 icon = {
                     Icon(
                         imageVector = ImageVector.vectorResource(destination.icon),
-                        contentDescription = "${destination.name} icon"
+                        contentDescription = stringResource(
+                            R.string.navigationBarItem_icon_description,
+                            destination.name
+                        )
                     )
                 }
             )
@@ -151,7 +154,7 @@ fun TaskNavigationBar(
 
 @Composable
 fun TaskManagerFloatingActionButton(navController: NavHostController) {
-    FloatingActionButton(onClick = { navController.navigate(Screen.Add.route) }, ) {
-        Icon(Icons.Default.Add, "")
+    FloatingActionButton(onClick = { navController.navigate(Screen.Add.route) }) {
+        Icon(Icons.Default.Add, stringResource(R.string.add_new_task_floating_button_description))
     }
 }

@@ -25,24 +25,28 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.taskmanager.R
 import com.example.taskmanager.core.data.model.Task
 import com.example.taskmanager.core.data.model.TaskStatus
 import com.marosseleng.compose.material3.datetimepickers.date.ui.dialog.DatePickerDialog
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun AddTaskScreen(viewModel: AddTaskViewModel = hiltViewModel()) {
 
+    val normalPadding = dimensionResource(id = R.dimen.padding_normal)
+    val dateFormat = stringResource(id = R.string.date_format)
+
     var taskName by remember { mutableStateOf("") }
     var taskDescription by remember { mutableStateOf("") }
 
-    val calendar = Calendar.getInstance()
     val onBackPresserDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
@@ -54,16 +58,16 @@ fun AddTaskScreen(viewModel: AddTaskViewModel = hiltViewModel()) {
     }
 
     var selectedDate by remember { mutableStateOf("") }
-    val startingDate = LocalDate.now()
-        .format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+    var startingDate = LocalDate.now()
+        .format(DateTimeFormatter.ofPattern(dateFormat))
+
 
 
     Scaffold(floatingActionButton = {
         FloatingActionButton(onClick = {
-
             if (!nameIsEmpty && !descriptionIsEmpty) {
                 viewModel.addNewTask(
-                    Task(0, taskName, taskDescription, selectedDate, TaskStatus.TODO)
+                    Task(0, taskName, taskDescription, startingDate, TaskStatus.TODO)
                 )
                 onBackPresserDispatcher?.onBackPressed()
             }
@@ -80,34 +84,48 @@ fun AddTaskScreen(viewModel: AddTaskViewModel = hiltViewModel()) {
         ) {
             OutlinedTextField(
                 value = taskName,
-                label = { Text("Name") },
+                label = { Text(stringResource(R.string.addTask_name_field_label)) },
                 onValueChange = { newName ->
                     taskName = newName
-                    nameIsEmpty = !newName.matches(Regex("^(?=\\S*\\p{L})\\S+\$"))
+                    nameIsEmpty = !newName.matches(Regex("^.*[^ ].{0,100}\$"))
                 },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 isError = nameIsEmpty,
-                supportingText = { Text(if (nameIsEmpty) "Name can't be empty" else "") }
+                supportingText = {
+                    Text(
+                        if (nameIsEmpty) stringResource(
+                            R.string.addTask_input_error_text,
+                            stringResource(R.string.addTask_name_field_label)
+                        ) else ""
+                    )
+                }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(normalPadding))
 
             OutlinedTextField(
                 value = taskDescription,
-                label = { Text("Description") },
+                label = { Text(stringResource(R.string.addTask_description_field_label)) },
                 onValueChange = { newDescription ->
                     taskDescription = newDescription
-                    descriptionIsEmpty = !newDescription.matches(Regex("^(?=\\S*\\p{L})\\S+\$"))
+                    descriptionIsEmpty = !newDescription.matches(Regex("^.*[^ ].{0,20}$"))
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(120.dp),
+                    .height(dimensionResource(R.dimen.addTask_description_field_height)),
                 isError = descriptionIsEmpty,
-                supportingText = { Text(if (descriptionIsEmpty) "Description can't be empty" else "") }
+                supportingText = {
+                    Text(
+                        if (descriptionIsEmpty) stringResource(
+                            R.string.addTask_input_error_text,
+                            stringResource(R.string.addTask_description_field_label)
+                        ) else ""
+                    )
+                }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(normalPadding))
 
             OutlinedTextField(
                 value = if (selectedDate == "") startingDate else selectedDate,
@@ -118,7 +136,10 @@ fun AddTaskScreen(viewModel: AddTaskViewModel = hiltViewModel()) {
                 singleLine = true,
                 trailingIcon = {
                     IconButton(onClick = { isDateDialogShown = true }) {
-                        Icon(Icons.Default.DateRange, contentDescription = "Date picker icon")
+                        Icon(
+                            Icons.Default.DateRange,
+                            contentDescription = stringResource(id = R.string.addTask_datePicker_icon_description)
+                        )
                     }
                 }
             )
@@ -126,11 +147,13 @@ fun AddTaskScreen(viewModel: AddTaskViewModel = hiltViewModel()) {
             if (isDateDialogShown) {
                 DatePickerDialog(
                     onDismissRequest = { isDateDialogShown = false },
-                    onDateChange = {
-                        selectedDate = it.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                    onDateChange = { date ->
+                        startingDate = date.format(
+                            DateTimeFormatter.ofPattern(dateFormat)
+                        )
                         isDateDialogShown = false
                     },
-                    title = { Text("Select date") },
+                    title = { Text(stringResource(R.string.addTask_datePicker_header_text)) },
                     initialDate = LocalDate.now()
                 )
             }

@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.example.taskmanager.R
@@ -58,15 +59,17 @@ fun TaskList(
                 val currentItem by rememberUpdatedState(item)
                 val dismissState = rememberDismissState(
                     confirmStateChange = {
-                        when(it) {
+                        when (it) {
                             DismissValue.DismissedToStart -> {
                                 swipeEndToStartFunctionality(currentItem, viewModel)
                                 true
                             }
+
                             DismissValue.DismissedToEnd -> {
                                 swipeStartToEndFunctionality(currentItem, viewModel)
                                 true
                             }
+
                             else -> false
                         }
                     }
@@ -90,7 +93,7 @@ fun TaskList(
                         DismissDirection.EndToStart
                     ),
                     dismissThresholds = {
-                        FractionalThreshold( 0.2f)
+                        FractionalThreshold(0.2f)
                     },
                     background = {
                         SwipeBackground(item, dismissState)
@@ -105,7 +108,7 @@ fun TaskList(
 }
 
 fun swipeEndToStartFunctionality(task: Task, viewModel: TaskListViewModel) {
-    when(task.taskStatus) {
+    when (task.taskStatus) {
         TaskStatus.TODO -> viewModel.removeTask(task)
         TaskStatus.IN_PROGRESS -> viewModel.updateTaskStatus(task, TaskStatus.TODO)
         TaskStatus.DONE -> viewModel.updateTaskStatus(task, TaskStatus.IN_PROGRESS)
@@ -114,7 +117,7 @@ fun swipeEndToStartFunctionality(task: Task, viewModel: TaskListViewModel) {
 }
 
 fun swipeStartToEndFunctionality(task: Task, viewModel: TaskListViewModel) {
-    when(task.taskStatus) {
+    when (task.taskStatus) {
         TaskStatus.TODO -> viewModel.updateTaskStatus(task, TaskStatus.IN_PROGRESS)
         TaskStatus.IN_PROGRESS -> viewModel.updateTaskStatus(task, TaskStatus.DONE)
         TaskStatus.DONE -> viewModel.removeTask(task)
@@ -139,8 +142,8 @@ fun SwipeBackground(task: Task, dismissState: DismissState) {
     val color by animateColorAsState(
         when (dismissState.targetValue) {
             DismissValue.Default -> Color.LightGray
-            DismissValue.DismissedToEnd -> if(nextStatus != null) Color.Green else Color.Red
-            DismissValue.DismissedToStart -> if(previousStatus != null) Color.Green else Color.Red
+            DismissValue.DismissedToEnd -> if (nextStatus != null) Color.Green else Color.Red
+            DismissValue.DismissedToStart -> if (previousStatus != null) Color.Green else Color.Red
         }, label = ""
     )
     val alignment = when (direction) {
@@ -156,9 +159,14 @@ fun SwipeBackground(task: Task, dismissState: DismissState) {
         label = ""
     )
 
-    val text = when (direction) {
-        DismissDirection.StartToEnd -> if(nextStatus != null) "Move to " else "Remove "
-        DismissDirection.EndToStart -> if(previousStatus != null) "Move to " else "Remove "
+    val actionTextResource = when (direction) {
+        DismissDirection.StartToEnd ->
+            if (nextStatus != null) R.string.tasklist_action_move_to
+            else R.string.tasklist_action_remove
+
+        DismissDirection.EndToStart ->
+            if (previousStatus != null) R.string.tasklist_action_move_to
+            else R.string.tasklist_action_remove
     }
 
     Box(
@@ -170,11 +178,12 @@ fun SwipeBackground(task: Task, dismissState: DismissState) {
     ) {
         Row {
             Text(
-                text,
-                modifier = Modifier.scale(scale))
+                stringResource(actionTextResource),
+                modifier = Modifier.scale(scale)
+            )
             Icon(
                 icon,
-                contentDescription = "Icon",
+                contentDescription = stringResource(R.string.tasklist_action_icon_description),
                 modifier = Modifier.scale(scale)
             )
         }
