@@ -7,7 +7,5 @@ q
 Aapp/src/main/java/com/example/taskmanager/core/data/model/Task.kt,1\e\1e4cb7327143ad03bcf84e45ab24ec16df3d9a44
 {
 Kapp/src/main/java/com/example/taskmanager/core/common/component/TaskItem.kt,1\a\1af02c1447be307e8ca60c99fef6db1495870ba7
-i
-9app/src/main/java/com/example/taskmanager/MainActivity.kt,3\a\3a278170b1e4bd08187e72dd99f850e34dc0510a
 t
 Dapp/src/main/java/com/example/taskmanager/navigation/BottomBarTab.kt,a\9\a9d62f214b8741ac6c6a2667c4a13c26fe62f193

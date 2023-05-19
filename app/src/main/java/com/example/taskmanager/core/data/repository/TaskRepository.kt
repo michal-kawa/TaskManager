@@ -10,6 +10,9 @@ import javax.inject.Singleton
 
 @Singleton
 class ImplTaskRepository @Inject constructor(private val taskDao: TaskDao) : TaskRepository {
+    override fun getTaskById(id: Int): Task =
+        taskDao.getTaskById(id).asModel()
+
     override fun getTodoTaskList() =
         taskDao.getTaskList(TaskStatus.TODO.name).map { it.asModel() }
 
@@ -31,6 +34,7 @@ class ImplTaskRepository @Inject constructor(private val taskDao: TaskDao) : Tas
 }
 
 interface TaskRepository {
+    fun getTaskById(id: Int): Task
     fun getTodoTaskList(): List<Task>
     fun getInProgressTaskList(): List<Task>
     fun getDoneTaskList(): List<Task>

@@ -10,15 +10,18 @@ import com.example.taskmanager.core.database.model.TaskEntity
 @Dao
 interface TaskDao {
 
+    @Query("SELECT * FROM task WHERE id LIKE :id ")
+    fun getTaskById(id: Int): TaskEntity
+
     @Query("SELECT * FROM task WHERE taskStatus LIKE :taskStatus ")
     fun getTaskList(taskStatus: String): List<TaskEntity>
 
     @Update(entity = TaskEntity::class)
-    fun updateTask(vararg task: TaskEntity)
+    fun updateTask(task: TaskEntity)
 
     @Delete
-    fun removeTask(vararg task: TaskEntity)
+    fun removeTask(task: TaskEntity)
 
     @Insert
-    fun insertTask(vararg task: TaskEntity)
+    fun insertTask(task: TaskEntity)
 }
