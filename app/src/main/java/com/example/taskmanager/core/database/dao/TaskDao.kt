@@ -10,14 +10,8 @@ import com.example.taskmanager.core.database.model.TaskEntity
 @Dao
 interface TaskDao {
 
-    @Query("SELECT * FROM task WHERE taskStatus LIKE 'TODO' ")
-    fun getTodoTaskList(): List<TaskEntity>
-
-    @Query("SELECT * FROM task WHERE taskStatus LIKE 'IN_PROGRESS' ")
-    fun getInProgressTaskList(): List<TaskEntity>
-
-    @Query("SELECT * FROM task WHERE taskStatus LIKE 'DONE' ")
-    fun getDoneTaskList(): List<TaskEntity>
+    @Query("SELECT * FROM task WHERE taskStatus LIKE :taskStatus ")
+    fun getTaskList(taskStatus: String): List<TaskEntity>
 
     @Update(entity = TaskEntity::class)
     fun updateTask(vararg task: TaskEntity)

@@ -61,8 +61,6 @@ fun AddTaskScreen(viewModel: AddTaskViewModel = hiltViewModel()) {
     var startingDate = LocalDate.now()
         .format(DateTimeFormatter.ofPattern(dateFormat))
 
-
-
     Scaffold(floatingActionButton = {
         FloatingActionButton(onClick = {
             if (!nameIsEmpty && !descriptionIsEmpty) {

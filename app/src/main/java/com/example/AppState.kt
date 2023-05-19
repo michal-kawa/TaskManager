@@ -2,8 +2,6 @@ package com.example
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.lifecycle.Lifecycle
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph
 import androidx.navigation.NavHostController
@@ -40,9 +38,6 @@ class AppState(
         }
     }
 }
-
-//private fun NavBackStackEntry.lifecycleIsResumed() =
-//    this.lifecycle.currentState == Lifecycle.State.RESUMED
 
 private val NavGraph.startDestination: NavDestination?
     get() = findNode(startDestinationId)
