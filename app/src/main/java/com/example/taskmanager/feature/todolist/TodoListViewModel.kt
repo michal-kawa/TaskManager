@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,11 +26,14 @@ class TodoListViewModel @Inject constructor(
 
     init {
         refreshTaskList()
+        Timber.d("Lista zadan todo")
     }
 
     override fun refreshTaskList() {
         viewModelScope.launch(Dispatchers.IO) {
-            _uiState.update { it.copy(listOfTasks = taskRepository.getTodoTaskList()) }
+            taskRepository.getTodoTaskList().collect { taskList ->
+                _uiState.update { it.copy(listOfTasks = taskList) }
+            }
         }
     }
 
@@ -44,7 +48,7 @@ class TodoListViewModel @Inject constructor(
         var taskToUpdate = _uiState.value.listOfTasks.find { it.id == task.id }
         if (taskToUpdate != null) {
             viewModelScope.launch(Dispatchers.IO) {
-                taskRepository.updateTaskStatus(task.copy(taskStatus = newStatus))
+                taskRepository.updateTask(task.copy(taskStatus = newStatus))
             }
             refreshTaskList()
         }

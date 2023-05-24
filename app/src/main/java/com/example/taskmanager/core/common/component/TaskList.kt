@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.taskmanager.R
 import com.example.taskmanager.core.common.TaskListViewModel
 import com.example.taskmanager.core.data.model.Task
@@ -44,6 +45,7 @@ import com.example.taskmanager.core.data.model.getPreviousStatus
 @Composable
 fun TaskList(
     tasks: List<Task>,
+    navController: NavHostController,
     viewModel: TaskListViewModel
 ) {
     val lazyListState = rememberLazyListState()
@@ -99,7 +101,7 @@ fun TaskList(
                         SwipeBackground(item, dismissState)
                     },
                     dismissContent = {
-                        TaskItem(task = item)
+                        TaskItem(task = item, onClick = navController::navigate)
                     }
                 )
             }

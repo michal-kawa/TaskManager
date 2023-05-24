@@ -13,13 +13,11 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
@@ -38,6 +36,7 @@ import com.example.taskmanager.navigation.Screen
 import com.example.taskmanager.navigation.SetupNavGraph
 import com.example.taskmanager.ui.theme.TaskManagerTheme
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -46,6 +45,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MainScreen()
         }
+        Timber.plant(Timber.DebugTree())
     }
 }
 
@@ -111,9 +111,9 @@ fun TaskManagerTopBar(navController: NavHostController, bottomBarState: MutableS
                 )
             }
         },
-        colors = TopAppBarDefaults.smallTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
-        ),
+//        colors = TopAppBarDefaults.smallTopAppBarColors(
+//            containerColor = MaterialTheme.colorScheme.primaryContainer
+//        ),
         navigationIcon = {
             if (!bottomBarState.value) {
                 IconButton(onClick = { navController.popBackStack() }) {

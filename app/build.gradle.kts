@@ -84,6 +84,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("com.google.dagger:hilt-android-gradle-plugin:2.46")
+    implementation("com.jakewharton.timber:timber:5.0.1")
 }
 
 // Allow references to generated code

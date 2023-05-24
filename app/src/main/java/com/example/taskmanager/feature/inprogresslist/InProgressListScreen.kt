@@ -4,11 +4,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.example.taskmanager.core.common.component.TaskList
 
 @Composable
-fun InProgressListScreen(viewModel: InProgressListViewModel = hiltViewModel()) {
-    val tasks by viewModel.uiState.collectAsState()
+fun InProgressListScreen(
+    navController: NavHostController,
+    viewModel: InProgressListViewModel = hiltViewModel()
+) {
+    val state by viewModel.uiState.collectAsState()
 
-    TaskList(tasks.listOfTasks, viewModel)
+    TaskList(state.listOfTasks, navController, viewModel)
 }

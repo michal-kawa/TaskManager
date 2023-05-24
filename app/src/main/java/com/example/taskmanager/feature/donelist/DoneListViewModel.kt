@@ -29,7 +29,9 @@ class DoneListViewModel @Inject constructor(
 
     override fun refreshTaskList() {
         viewModelScope.launch(Dispatchers.IO) {
-            _uiState.update { it.copy(listOfTasks = taskRepository.getDoneTaskList()) }
+            taskRepository.getDoneTaskList().collect { taskList ->
+                _uiState.update { it.copy(listOfTasks = taskList) }
+            }
         }
     }
 
@@ -44,7 +46,7 @@ class DoneListViewModel @Inject constructor(
         val taskToUpdate = _uiState.value.listOfTasks.find { it.id == task.id }
         if (taskToUpdate != null) {
             viewModelScope.launch(Dispatchers.IO) {
-                taskRepository.updateTaskStatus(task.copy(taskStatus = newStatus))
+                taskRepository.updateTask(task.copy(taskStatus = newStatus))
             }
             refreshTaskList()
         }

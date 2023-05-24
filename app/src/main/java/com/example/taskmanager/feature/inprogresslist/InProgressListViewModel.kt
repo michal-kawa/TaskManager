@@ -18,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class InProgressListViewModel @Inject constructor(
     private val taskRepository: TaskRepository
-): ViewModel(), TaskListViewModel {
+) : ViewModel(), TaskListViewModel {
     private val _uiState = MutableStateFlow(InProgressListUiState())
     val uiState: StateFlow<InProgressListUiState> = _uiState.asStateFlow()
 
@@ -28,7 +28,9 @@ class InProgressListViewModel @Inject constructor(
 
     override fun refreshTaskList() {
         viewModelScope.launch(Dispatchers.IO) {
-            _uiState.update { it.copy(listOfTasks = taskRepository.getInProgressTaskList()) }
+            taskRepository.getInProgressTaskList().collect { taskList ->
+                _uiState.update { it.copy(listOfTasks = taskList) }
+            }
         }
     }
 
@@ -43,7 +45,7 @@ class InProgressListViewModel @Inject constructor(
         val taskToUpdate = _uiState.value.listOfTasks.find { it.id == task.id }
         if (taskToUpdate != null) {
             viewModelScope.launch(Dispatchers.IO) {
-                taskRepository.updateTaskStatus(task.copy(taskStatus = newStatus))
+                taskRepository.updateTask(task.copy(taskStatus = newStatus))
             }
             refreshTaskList()
         }
