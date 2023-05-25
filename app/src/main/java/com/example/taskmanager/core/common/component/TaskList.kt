@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,6 +22,8 @@ import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.rememberDismissState
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -88,7 +91,7 @@ fun TaskList(
                 SwipeToDismiss(
                     state = dismissState,
                     modifier = Modifier
-                        .padding(vertical = 1.dp)
+//                        .padding(vertical = 1.dp)
                         .animateItemPlacement(),
                     directions = setOf(
                         DismissDirection.StartToEnd,
@@ -144,8 +147,8 @@ fun SwipeBackground(task: Task, dismissState: DismissState) {
     val color by animateColorAsState(
         when (dismissState.targetValue) {
             DismissValue.Default -> Color.LightGray
-            DismissValue.DismissedToEnd -> if (nextStatus != null) Color.Green else Color.Red
-            DismissValue.DismissedToStart -> if (previousStatus != null) Color.Green else Color.Red
+            DismissValue.DismissedToEnd -> if (nextStatus == null) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.tertiaryContainer
+            DismissValue.DismissedToStart -> if (previousStatus == null) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.tertiaryContainer
         }, label = ""
     )
     val alignment = when (direction) {
