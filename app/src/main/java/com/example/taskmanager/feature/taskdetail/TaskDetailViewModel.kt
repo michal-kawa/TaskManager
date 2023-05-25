@@ -3,6 +3,7 @@ package com.example.taskmanager.feature.taskdetail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.taskmanager.core.data.repository.CommentRepository
 import com.example.taskmanager.core.data.repository.TaskRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +16,8 @@ import javax.inject.Inject
 @HiltViewModel
 class TaskDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val taskRepository: TaskRepository
+    private val taskRepository: TaskRepository,
+    private val commentRepository: CommentRepository,
 ) : ViewModel() {
 
     private val taskId: Int = checkNotNull(savedStateHandle["taskId"])
@@ -26,7 +28,13 @@ class TaskDetailViewModel @Inject constructor(
     init {
         viewModelScope.launch(Dispatchers.IO) {
             taskRepository.getTaskById(taskId).collect { task ->
-                _uiState.value = TaskDetailUiState(task)
+                _uiState.value = _uiState.value.copy(task = task)
+            }
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            commentRepository.getCommentForTask(taskId).collect { comments ->
+                _uiState.value = _uiState.value.copy(comments = comments)
             }
         }
     }

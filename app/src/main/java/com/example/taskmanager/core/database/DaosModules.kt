@@ -1,5 +1,6 @@
 package com.example.taskmanager.core.database
 
+import com.example.taskmanager.core.database.dao.CommentDao
 import com.example.taskmanager.core.database.dao.TaskDao
 import dagger.Module
 import dagger.Provides
@@ -13,4 +14,9 @@ object DaosModules {
     fun providesTaskDao(
         database: TaskManagerDatabase
     ): TaskDao = database.taskDao()
+
+    @Provides
+    fun providesCommentDao(
+        database: TaskManagerDatabase
+    ): CommentDao = database.commentDao()
 }
