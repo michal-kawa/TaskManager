@@ -6,7 +6,7 @@ data class Task(
     val id: Int,
     val title: String,
     val description: String,
-    val createDate: String,
+    val date: String,
     val taskStatus: TaskStatus,
 )
 
@@ -19,7 +19,7 @@ fun Task.asEntity() = TaskEntity(
     id = id,
     title = title,
     description = description,
-    createDate = createDate,
+    date = date,
     taskStatus = taskStatus.name
 )
 

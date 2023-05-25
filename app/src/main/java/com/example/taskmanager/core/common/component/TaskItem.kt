@@ -75,7 +75,7 @@ fun TaskItem(task: Task, onClick: (String) -> Unit) {
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = task.createDate,
+                            text = task.date,
                             color = MaterialTheme.colorScheme.onSecondaryContainer,
                             style = MaterialTheme.typography.bodySmall
                         )
@@ -100,7 +100,7 @@ fun TaskItemPreview() {
                 "23.05.2023",
                 TaskStatus.TODO
             ),
-            onClick = { "" }
+            onClick = {  }
         )
     }
 }
@@ -117,7 +117,7 @@ fun TaskItemPreviewNight() {
                 "23.05.2023",
                 TaskStatus.TODO
             ),
-            onClick = { "" }
+            onClick = {  }
         )
     }
 }

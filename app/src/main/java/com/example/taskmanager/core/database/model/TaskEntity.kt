@@ -10,7 +10,7 @@ data class TaskEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val title: String,
     val description: String,
-    val createDate: String,
+    val date: String,
     val taskStatus: String
 )
 
@@ -18,7 +18,7 @@ fun TaskEntity.asModel() = Task(
     id = id,
     title = title,
     description = description,
-    createDate = createDate,
+    date = date,
     taskStatus = when (taskStatus) {
         TaskStatus.TODO.name -> TaskStatus.TODO
         TaskStatus.IN_PROGRESS.name -> TaskStatus.IN_PROGRESS

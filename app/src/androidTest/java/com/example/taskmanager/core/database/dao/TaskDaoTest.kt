@@ -2,11 +2,9 @@ package com.example.taskmanager.core.database.dao
 
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
-import com.example.taskmanager.core.data.model.Task
 import com.example.taskmanager.core.data.model.TaskStatus
 import com.example.taskmanager.core.database.TaskManagerDatabase
 import com.example.taskmanager.core.database.model.TaskEntity
-import com.example.taskmanager.core.database.model.asModel
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -44,7 +42,7 @@ class TaskDaoTest {
         // When
         database.taskDao().insertTask(task)
         val resultTask = taskDao.getTaskById(task.id).first()
-        var resultTasks = taskDao.getTaskList("TODO").first()
+        val resultTasks = taskDao.getTaskList("TODO").first()
 
 
         // Then
@@ -61,7 +59,7 @@ class TaskDaoTest {
         database.taskDao().insertTask(task)
         task = database.taskDao().getTaskList(TaskStatus.TODO.name).first().first()
         database.taskDao().removeTask(task)
-        var resultTasks = taskDao.getTaskList("TODO").first()
+        val resultTasks = taskDao.getTaskList("TODO").first()
 
         // Then
         assertEquals(0, resultTasks.size)
@@ -114,7 +112,7 @@ class TaskDaoTest {
         id = 1,
         title = "Task title",
         description = "Task description",
-        createDate = "11.05.2023",
+        date = "11.05.2023",
         taskStatus = TaskStatus.TODO.name
     )
 
@@ -123,21 +121,21 @@ class TaskDaoTest {
             id = 2,
             title = "First todo task title",
             description = "First todo task description",
-            createDate = "11.05.2023",
+            date = "11.05.2023",
             taskStatus = TaskStatus.TODO.name
         ),
         TaskEntity(
             id = 3,
             title = "Second todo task title",
             description = "Second todo task description",
-            createDate = "12.08.2023",
+            date = "12.08.2023",
             taskStatus = TaskStatus.TODO.name
         ),
         TaskEntity(
             id = 4,
             title = "Third todo task title",
             description = "Third todo task description",
-            createDate = "1.10.2023",
+            date = "1.10.2023",
             taskStatus = TaskStatus.TODO.name
         )
     )
@@ -147,21 +145,21 @@ class TaskDaoTest {
             id = 5,
             title = "First in progress task title",
             description = "First in progress task description",
-            createDate = "5.02.2023",
+            date = "5.02.2023",
             taskStatus = TaskStatus.IN_PROGRESS.name
         ),
         TaskEntity(
             id = 6,
             title = "Second in progress task title",
             description = "Second in progress task description",
-            createDate = "25.04.2023",
+            date = "25.04.2023",
             taskStatus = TaskStatus.IN_PROGRESS.name
         ),
         TaskEntity(
             id = 7,
             title = "Third in progress task title",
             description = "Third in progress task description",
-            createDate = "9.06.2023",
+            date = "9.06.2023",
             taskStatus = TaskStatus.IN_PROGRESS.name
         )
     )
@@ -171,21 +169,21 @@ class TaskDaoTest {
             id = 8,
             title = "First done task title",
             description = "First done task description",
-            createDate = "16.03.2023",
+            date = "16.03.2023",
             taskStatus = TaskStatus.DONE.name
         ),
         TaskEntity(
             id = 9,
             title = "Second done task title",
             description = "Second done task description",
-            createDate = "8.05.2023",
+            date = "8.05.2023",
             taskStatus = TaskStatus.DONE.name
         ),
         TaskEntity(
             id = 10,
             title = "Third done task title",
             description = "Third done task description",
-            createDate = "30.07.2023",
+            date = "30.07.2023",
             taskStatus = TaskStatus.DONE.name
         )
     )

@@ -1,13 +1,12 @@
 package com.example.taskmanager.feature.taskdetail
 
 import android.content.res.Configuration
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -35,7 +34,10 @@ fun TaskDetailScreen(viewModel: TaskDetailViewModel = hiltViewModel()) {
 @Composable
 internal fun TaskDetailScreenComposable(state: TaskDetailUiState) {
     Surface {
-        Column(Modifier.padding(16.dp).fillMaxWidth()) {
+        Column(
+            Modifier
+                .padding(16.dp)
+                .fillMaxWidth()) {
             state.task?.let { task ->
 
                 TextField(
@@ -58,12 +60,20 @@ internal fun TaskDetailScreenComposable(state: TaskDetailUiState) {
                 Spacer(Modifier.height(24.dp))
                 TextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = task.createDate,
+                    value = task.date,
                     onValueChange = {},
                     label = { Text("Date",
                         style = MaterialTheme.typography.bodySmall) },
                     readOnly = true
                 )
+
+                Spacer(Modifier.height(16.dp))
+
+                Text("Comments")
+                Divider(thickness = 2.dp)
+
+
+
             }
         }
     }
