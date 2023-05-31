@@ -14,8 +14,8 @@ interface TaskDao {
     @Query("SELECT * FROM task WHERE id LIKE :id ")
     fun getTaskById(id: Int): Flow<TaskEntity>
 
-    @Query("SELECT * FROM task WHERE taskStatus LIKE :taskStatus ")
-    fun getTaskList(taskStatus: String): Flow<List<TaskEntity>>
+    @Query("SELECT * FROM task")
+    fun getTaskList(): Flow<List<TaskEntity>>
 
     @Update(entity = TaskEntity::class)
     fun updateTask(task: TaskEntity)

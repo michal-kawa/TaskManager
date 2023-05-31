@@ -6,34 +6,33 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.taskmanager.feature.addtask.AddTaskScreen
-import com.example.taskmanager.feature.donelist.DoneListScreen
-import com.example.taskmanager.feature.inprogresslist.InProgressListScreen
 import com.example.taskmanager.feature.taskdetail.TaskDetailScreen
-import com.example.taskmanager.feature.todolist.TodoListScreen
+import com.example.taskmanager.feature.tasklists.TaskListsScreen
 
 @Composable
-fun SetupNavGraph(navController: NavHostController, startDestination: String) {
+fun SetupNavHostGraph(navController: NavHostController, startDestination: String) {
     androidx.navigation.compose.NavHost(
         navController = navController,
         startDestination = startDestination
     ) {
-        composable(route = Screen.Todo.route) {
-            TodoListScreen(navController)
+        composable(route = MainScreen.TaskList.route) {
+            TaskListsScreen(navController)
         }
-        composable(route = Screen.Inprogress.route) {
-            InProgressListScreen(navController)
-        }
-        composable(route = Screen.Done.route) {
-            DoneListScreen(navController)
-        }
-        composable(route = Screen.Add.route) {
+        composable(route = MainScreen.Add.route) {
             AddTaskScreen()
         }
         composable(
-            route = Screen.Task.route,
+            route = MainScreen.TaskDetail.route,
             arguments = listOf(navArgument("taskId") { type = NavType.IntType })
         ) {
             TaskDetailScreen()
         }
     }
+}
+
+sealed class MainScreen(val route: String) {
+    //    object Splash: Screen("splash_screen")
+    object TaskList : MainScreen("task_list_screen")
+    object Add : MainScreen("add_task_screen")
+    object TaskDetail : MainScreen("task_screen/{taskId}")
 }

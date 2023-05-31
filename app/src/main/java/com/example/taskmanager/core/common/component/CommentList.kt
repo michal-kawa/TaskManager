@@ -1,6 +1,7 @@
 package com.example.taskmanager.core.common.component
 
 import android.content.res.Configuration
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,11 +12,14 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.taskmanager.core.data.model.Comment
+import com.example.taskmanager.feature.taskdetail.TaskDetailUiState
 import com.example.taskmanager.ui.theme.TaskManagerTheme
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CommentList(
-    comments: List<Comment>,
+    state: TaskDetailUiState,
+    onItemLongClick: (Comment) -> Unit
 ) {
     val lazyListState = rememberLazyListState()
 
@@ -24,11 +28,19 @@ fun CommentList(
         state = lazyListState,
     ) {
         items(
-            items = comments,
+            items = state.comments,
             key = { comment -> comment.id },
             itemContent = { item ->
                 val currentItem by rememberUpdatedState(item)
-                CommentItem(comment = currentItem)
+                currentItem.let {
+
+                    CommentItem(
+                        comment = it,
+                        isSelected = state.selectedComments.contains(it),
+                        onItemLongClick = onItemLongClick
+                    )
+
+                }
             }
         )
     }
@@ -38,7 +50,11 @@ fun CommentList(
 @Composable
 fun CommentListLightMode() {
     TaskManagerTheme {
-        CommentList(comments = getSampleCommentList())
+        CommentList(
+            TaskDetailUiState(
+                comments = getSampleCommentList(),
+                selectedComments = getSampleCommentList()
+            ), {})
     }
 }
 
@@ -46,7 +62,11 @@ fun CommentListLightMode() {
 @Composable
 fun CommentListNightMode() {
     TaskManagerTheme {
-        CommentList(comments = getSampleCommentList())
+        CommentList(
+            TaskDetailUiState(
+                comments = getSampleCommentList(),
+                selectedComments = getSampleCommentList()
+            ), {})
     }
 }
 

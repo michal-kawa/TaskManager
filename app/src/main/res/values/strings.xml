@@ -13,20 +13,24 @@
 
 
     // AddTaskScreen
-    <string name="addTask_input_error_text">$s can\'t be empty</string>
+    <string name="addTask_title_error_text">Title can\'t be empty</string>
+    <string name="addTask_description_error_text">Description can\'t be empty</string>
     <string name="addTask_datePicker_icon_description">Date picker icon</string>
     <string name="addTask_datePicker_header_text">Select date</string>
     <string name="addTask_name_field_label">Name</string>
     <string name="addTask_description_field_label">Description</string>
+    <string name="addTask_date_field_label">Date</string>
 
     // MainActivity
     <string name="navigationBarItem_icon_description">$s icon</string>
     <string name="add_new_task_floating_button_description">Add new task button</string>
     <string name="back_button_description">Back button</string>
+    <string name="edit_button_description">Edit button</string>
     <string name="lists_topBar_title">Task Manager</string>
     <string name="add_new_task_topBar_title">Add New Task</string>
 
     // Common
     <string name="date_format">dd.MM.yyyy</string>
+    <string name="empty_string" />
 
 </resources>

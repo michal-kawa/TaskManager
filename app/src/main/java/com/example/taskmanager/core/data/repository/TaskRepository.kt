@@ -1,7 +1,6 @@
 package com.example.taskmanager.core.data.repository
 
 import com.example.taskmanager.core.data.model.Task
-import com.example.taskmanager.core.data.model.TaskStatus
 import com.example.taskmanager.core.data.model.asEntity
 import com.example.taskmanager.core.database.dao.TaskDao
 import com.example.taskmanager.core.database.model.asModel
@@ -12,17 +11,11 @@ import javax.inject.Singleton
 
 @Singleton
 class ImplTaskRepository @Inject constructor(private val taskDao: TaskDao) : TaskRepository {
+    override fun getTaskList(): Flow<List<Task>> =
+        taskDao.getTaskList().map { list -> list.map { it.asModel() } }
+
     override fun getTaskById(id: Int) =
         taskDao.getTaskById(id).map { it.asModel() }
-
-    override fun getTodoTaskList() =
-        taskDao.getTaskList(TaskStatus.TODO.name).map { list -> list.map { it.asModel() } }
-
-    override fun getInProgressTaskList() =
-        taskDao.getTaskList(TaskStatus.IN_PROGRESS.name).map { list -> list.map { it.asModel() } }
-
-    override fun getDoneTaskList() =
-        taskDao.getTaskList(TaskStatus.DONE.name).map { list -> list.map { it.asModel() } }
 
     override suspend fun updateTask(task: Task) =
         taskDao.updateTask(task.asEntity())
@@ -36,10 +29,8 @@ class ImplTaskRepository @Inject constructor(private val taskDao: TaskDao) : Tas
 }
 
 interface TaskRepository {
+    fun getTaskList(): Flow<List<Task>>
     fun getTaskById(id: Int): Flow<Task>
-    fun getTodoTaskList(): Flow<List<Task>>
-    fun getInProgressTaskList(): Flow<List<Task>>
-    fun getDoneTaskList(): Flow<List<Task>>
     suspend fun updateTask(task: Task)
     suspend fun removeTask(task: Task)
     suspend fun addTask(task: Task)

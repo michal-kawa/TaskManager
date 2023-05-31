@@ -7,7 +7,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,7 +21,6 @@ import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.rememberDismissState
-import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,7 +36,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.taskmanager.R
-import com.example.taskmanager.core.common.TaskListViewModel
 import com.example.taskmanager.core.data.model.Task
 import com.example.taskmanager.core.data.model.TaskStatus
 import com.example.taskmanager.core.data.model.getNextStatus
@@ -49,7 +46,8 @@ import com.example.taskmanager.core.data.model.getPreviousStatus
 fun TaskList(
     tasks: List<Task>,
     navController: NavHostController,
-    viewModel: TaskListViewModel
+    updateItemData: (Task, TaskStatus) -> Unit,
+    remoteItem: (Task) -> Unit,
 ) {
     val lazyListState = rememberLazyListState()
 
@@ -66,12 +64,20 @@ fun TaskList(
                     confirmStateChange = {
                         when (it) {
                             DismissValue.DismissedToStart -> {
-                                swipeEndToStartFunctionality(currentItem, viewModel)
+                                swipeEndToStartFunctionality(
+                                    currentItem,
+                                    updateItemData,
+                                    remoteItem
+                                )
                                 true
                             }
 
                             DismissValue.DismissedToEnd -> {
-                                swipeStartToEndFunctionality(currentItem, viewModel)
+                                swipeStartToEndFunctionality(
+                                    currentItem,
+                                    updateItemData,
+                                    remoteItem
+                                )
                                 true
                             }
 
@@ -81,11 +87,19 @@ fun TaskList(
                 )
 
                 if (dismissState.isDismissed(DismissDirection.EndToStart)) {
-                    swipeEndToStartFunctionality(currentItem, viewModel)
+                    swipeEndToStartFunctionality(
+                        currentItem,
+                        updateItemData,
+                        remoteItem
+                    )
                 }
 
                 if (dismissState.isDismissed(DismissDirection.StartToEnd)) {
-                    swipeStartToEndFunctionality(currentItem, viewModel)
+                    swipeStartToEndFunctionality(
+                        currentItem,
+                        updateItemData,
+                        remoteItem
+                    )
                 }
 
                 SwipeToDismiss(
@@ -112,22 +126,30 @@ fun TaskList(
     }
 }
 
-fun swipeEndToStartFunctionality(task: Task, viewModel: TaskListViewModel) {
+fun swipeEndToStartFunctionality(
+    task: Task,
+    updateItemData: (Task, TaskStatus) -> Unit,
+    remoteItem: (Task) -> Unit
+) {
     when (task.taskStatus) {
-        TaskStatus.TODO -> viewModel.removeTask(task)
-        TaskStatus.IN_PROGRESS -> viewModel.updateTaskStatus(task, TaskStatus.TODO)
-        TaskStatus.DONE -> viewModel.updateTaskStatus(task, TaskStatus.IN_PROGRESS)
+        TaskStatus.TODO -> remoteItem(task)
+        TaskStatus.IN_PROGRESS -> updateItemData(task, TaskStatus.TODO)
+        TaskStatus.DONE -> updateItemData(task, TaskStatus.IN_PROGRESS)
     }
-    viewModel.refreshTaskList()
+//    viewModel.refreshTaskList()
 }
 
-fun swipeStartToEndFunctionality(task: Task, viewModel: TaskListViewModel) {
+fun swipeStartToEndFunctionality(
+    task: Task,
+    updateItemData: (Task, TaskStatus) -> Unit,
+    remoteItem: (Task) -> Unit
+) {
     when (task.taskStatus) {
-        TaskStatus.TODO -> viewModel.updateTaskStatus(task, TaskStatus.IN_PROGRESS)
-        TaskStatus.IN_PROGRESS -> viewModel.updateTaskStatus(task, TaskStatus.DONE)
-        TaskStatus.DONE -> viewModel.removeTask(task)
+        TaskStatus.TODO -> updateItemData(task, TaskStatus.IN_PROGRESS)
+        TaskStatus.IN_PROGRESS -> updateItemData(task, TaskStatus.DONE)
+        TaskStatus.DONE -> remoteItem(task)
     }
-    viewModel.refreshTaskList()
+//    viewModel.refreshTaskList()
 }
 
 @OptIn(ExperimentalMaterialApi::class)
