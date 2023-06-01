@@ -29,6 +29,9 @@
     <string name="lists_topBar_title">Task Manager</string>
     <string name="add_new_task_topBar_title">Add New Task</string>
 
+    // TaskDetailScreen
+    <string name="delete_task_action_icon_description">Delete tasks icon</string>
+
     // Common
     <string name="date_format">dd.MM.yyyy</string>
     <string name="empty_string" />

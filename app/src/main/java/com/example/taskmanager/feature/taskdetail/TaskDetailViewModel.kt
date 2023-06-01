@@ -64,4 +64,22 @@ class TaskDetailViewModel @Inject constructor(
                 _uiState.value.copy(selectedComments = _uiState.value.selectedComments + comment)
         }
     }
+
+    fun removeSelectedComments() {
+        val job = viewModelScope.launch(Dispatchers.IO) {
+            uiState.value.selectedComments.forEach {
+                commentRepository.removeComment(it)
+            }
+        }
+
+        viewModelScope.launch {
+            job.join()
+
+            _uiState.value =
+                _uiState.value.copy(
+                    comments = _uiState.value.comments - uiState.value.selectedComments,
+                    selectedComments = emptyList()
+                )
+        }
+    }
 }

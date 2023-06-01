@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -28,8 +29,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.taskmanager.R
 import com.example.taskmanager.core.common.component.InputTextField
+import com.example.taskmanager.core.common.component.TaskManagerTopBar
 import com.example.taskmanager.core.data.model.Task
 import com.example.taskmanager.core.data.model.TaskStatus
 import com.marosseleng.compose.material3.datetimepickers.date.ui.dialog.DatePickerDialog
@@ -38,7 +42,10 @@ import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun AddTaskScreen(viewModel: AddTaskViewModel = hiltViewModel()) {
+fun AddTaskScreen(
+    navHostController: NavHostController,
+    viewModel: AddTaskViewModel = hiltViewModel()
+) {
 
     val normalPadding = dimensionResource(id = R.dimen.padding_normal)
     val dateFormat = stringResource(id = R.string.date_format)
@@ -60,18 +67,27 @@ fun AddTaskScreen(viewModel: AddTaskViewModel = hiltViewModel()) {
     var startingDate = LocalDate.now()
         .format(DateTimeFormatter.ofPattern(dateFormat))
 
-    Scaffold(floatingActionButton = {
-        FloatingActionButton(onClick = {
-            if (!nameIsEmpty && !descriptionIsEmpty) {
-                viewModel.addNewTask(
-                    Task(0, taskName, taskDescription, startingDate, TaskStatus.TODO)
-                )
-                onBackPresserDispatcher?.onBackPressed()
+    Scaffold(
+        topBar = {
+            TaskManagerTopBar(
+                navController = navHostController,
+                navigationIcon = Icons.Default.ArrowBack,
+                navigationIconContentDescription = stringResource(R.string.back_button_description),
+                onNavigationClick = navHostController::popBackStack,
+            )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                if (!nameIsEmpty && !descriptionIsEmpty) {
+                    viewModel.addNewTask(
+                        Task(0, taskName, taskDescription, startingDate, TaskStatus.TODO)
+                    )
+                    onBackPresserDispatcher?.onBackPressed()
+                }
+            }) {
+                Icon(Icons.Default.Add, "")
             }
         }) {
-            Icon(Icons.Default.Add, "")
-        }
-    }) {
 
         Column(
             modifier = Modifier
@@ -145,5 +161,5 @@ fun AddTaskScreen(viewModel: AddTaskViewModel = hiltViewModel()) {
 @Preview
 @Composable
 fun AddTaskPreview() {
-    AddTaskScreen()
+    AddTaskScreen(rememberNavController())
 }

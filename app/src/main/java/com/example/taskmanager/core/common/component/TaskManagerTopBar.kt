@@ -21,6 +21,7 @@ fun TaskManagerTopBar(
     navigationIcon: ImageVector?,
     navigationIconContentDescription: String?,
     onNavigationClick: () -> Unit = { },
+    showActionIcon: Boolean = false,
     actionIcon: ImageVector? = null,
     actionIconContentDescription: String? = null,
     onActionClick: () -> Unit = { },
@@ -49,9 +50,9 @@ fun TaskManagerTopBar(
             }
         },
         actions = {
-            if (actionIcon != null) {
+            if (showActionIcon) {
                 IconButton(onClick = { onActionClick() }) {
-                    Icon(actionIcon, actionIconContentDescription)
+                    Icon(actionIcon!!, actionIconContentDescription)
                 }
             }
         }

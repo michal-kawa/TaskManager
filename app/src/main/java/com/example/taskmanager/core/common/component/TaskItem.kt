@@ -34,7 +34,7 @@ import com.example.taskmanager.ui.theme.TaskManagerTheme
 fun TaskItem(task: Task, onClick: (String) -> Unit) {
     val normalPadding = 16.dp
     Surface {
-        Column(modifier = Modifier.clickable { onClick("task_screen/" + task.id) },) {
+        Column(modifier = Modifier.clickable { onClick("task_detail_screen/" + task.id) },) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

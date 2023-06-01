@@ -15,25 +15,26 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.example.taskmanager.R
 import com.example.taskmanager.TaskNavigationBar
 import com.example.taskmanager.core.common.component.TaskList
 import com.example.taskmanager.core.common.component.TaskManagerFloatingActionButton
 import com.example.taskmanager.core.common.component.TaskManagerTopBar
 import com.example.taskmanager.navigation.BottomBarTab
-import com.example.taskmanager.navigation.MainScreen
+import com.example.taskmanager.navigation.ListScreen
 import com.example.taskmanager.navigation.SetupNavBottomGraph
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskListsScreen(
-    navController: NavHostController,
+    navHostController: NavHostController,
     viewModel: TaskListsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val bottomNavItems = BottomBarTab.values().toList()
-    val backStackEntry = navController.currentBackStackEntryAsState()
-
+    val backStackEntry = navHostController.currentBackStackEntryAsState()
+    val navBottomBarController = rememberNavController()
 
     LaunchedEffect(uiState) {
         viewModel.refreshTaskList()
@@ -43,20 +44,19 @@ fun TaskListsScreen(
         modifier = Modifier,
         topBar = {
             TaskManagerTopBar(
-                navController = navController,
+                navController = navHostController,
                 navigationIcon = Icons.Default.ArrowBack,
                 navigationIconContentDescription = stringResource(R.string.back_button_description),
-                onNavigationClick = navController::popBackStack,
+                onNavigationClick = navHostController::popBackStack,
             )
         },
-        bottomBar = { TaskNavigationBar(navController, backStackEntry, bottomNavItems) },
+        bottomBar = { TaskNavigationBar(navBottomBarController, backStackEntry, bottomNavItems) },
         floatingActionButton = {
-            TaskManagerFloatingActionButton(navController)
-
+            TaskManagerFloatingActionButton(navHostController)
         }
     ) {
         Box(modifier = Modifier.padding(it)) {
-            SetupNavBottomGraph(navController, MainScreen.TaskList.route, viewModel)
+            SetupNavBottomGraph(navHostController, navBottomBarController, ListScreen.Todo.route, viewModel)
         }
     }
 }

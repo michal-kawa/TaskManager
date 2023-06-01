@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.ButtonDefaults
@@ -23,132 +25,167 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.taskmanager.core.common.component.CommentList
+import com.example.taskmanager.core.common.component.TaskManagerTopBar
 import com.example.taskmanager.core.data.model.Comment
 import com.example.taskmanager.core.data.model.Task
 import com.example.taskmanager.core.data.model.TaskStatus
 import com.example.taskmanager.ui.theme.TaskManagerTheme
 
 @Composable
-fun TaskDetailScreen(viewModel: TaskDetailViewModel = hiltViewModel()) {
+fun TaskDetailScreen(
+    navHostController: NavHostController,
+    viewModel: TaskDetailViewModel = hiltViewModel()
+) {
     val state = viewModel.uiState.collectAsState()
 
-    TaskDetailScreenComposable(state.value, viewModel::addCommentAction, viewModel::selectComment)
+    TaskDetailScreenComposable(
+        navHostController,
+        state.value,
+        viewModel::addCommentAction,
+        viewModel::selectComment,
+        viewModel::removeSelectedComments
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun TaskDetailScreenComposable(
+    navHostController: NavHostController,
     state: TaskDetailUiState,
     addCommentAction: (String) -> Unit,
-    selectCommentAction: (Comment) -> Unit
+    selectCommentAction: (Comment) -> Unit,
+    onActionIconClick: () -> Unit
 ) {
 
     var isNewCommentDialogShown: Boolean by rememberSaveable {
         mutableStateOf(false)
     }
 
-    Surface {
-        Column(
-            Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
-        ) {
-            state.task?.let { task ->
+    Scaffold(
+        topBar = {
+            TaskManagerTopBar(
+                navController = navHostController,
+                navigationIcon = Icons.Default.ArrowBack,
+                navigationIconContentDescription = stringResource(com.example.taskmanager.R.string.back_button_description),
+                onNavigationClick = navHostController::popBackStack,
+                showActionIcon = state.deleteCommentOption,
+                actionIcon = Icons.Default.Delete,
+                actionIconContentDescription = stringResource(com.example.taskmanager.R.string.delete_task_action_icon_description),
+                onActionClick = onActionIconClick
+            )
+        }
+    ) { paddingValues ->
+        Surface {
+            Column(
+                Modifier
+                    .padding(16.dp)
+                    .padding(paddingValues)
+                    .fillMaxWidth()
+            ) {
+                state.task?.let { task ->
 
-                TextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = task.title,
-                    onValueChange = {},
-                    label = {
-                        Text(
-                            "Title", Modifier.padding(horizontal = 4.dp),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    },
-                    readOnly = true
-                )
-                Spacer(Modifier.height(24.dp))
-                TextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = task.description,
-                    onValueChange = {},
-                    label = {
-                        Text(
-                            "Description",
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    },
-                    readOnly = true
-                )
-                Spacer(Modifier.height(24.dp))
-                TextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = task.date,
-                    onValueChange = {},
-                    label = {
-                        Text(
-                            "Date",
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    },
-                    readOnly = true
-                )
-
-                Spacer(Modifier.height(24.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        "Comments", style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onSurface
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = task.title,
+                        onValueChange = {},
+                        label = {
+                            Text(
+                                "Title", Modifier.padding(horizontal = 4.dp),
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        },
+                        readOnly = true
                     )
-                    IconButton(
-                        modifier = Modifier.size(36.dp),
-                        onClick = { isNewCommentDialogShown = true },
+                    Spacer(Modifier.height(24.dp))
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = task.description,
+                        onValueChange = {},
+                        label = {
+                            Text(
+                                "Description",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        },
+                        readOnly = true
+                    )
+                    Spacer(Modifier.height(24.dp))
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = task.date,
+                        onValueChange = {},
+                        label = {
+                            Text(
+                                "Date",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        },
+                        readOnly = true
+                    )
+
+                    Spacer(Modifier.height(24.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "",
-                            modifier = Modifier.fillMaxSize(),
-                            tint = MaterialTheme.colorScheme.primary
+                        Text(
+                            "Comments", style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
+                        IconButton(
+                            modifier = Modifier.size(36.dp),
+                            onClick = { isNewCommentDialogShown = true },
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "",
+                                modifier = Modifier.fillMaxSize(),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
-                }
 
-                Divider(Modifier.height(2.dp))
+                    Divider(Modifier.height(2.dp))
 
-                if (state.comments.isEmpty()) {
-                    Text(
-                        "Empty list of comments",
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                } else {
-                    CommentList(state, selectCommentAction)
-                }
+                    if (state.comments.isEmpty()) {
+                        Text(
+                            "Empty list of comments",
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    } else {
+                        CommentList(state, selectCommentAction)
+                    }
 
-                if (isNewCommentDialogShown) {
-                    AddCommentDialog({ isNewCommentDialogShown = false }, addCommentAction)
+                    if (isNewCommentDialogShown) {
+                        AddCommentDialog({ isNewCommentDialogShown = false }, addCommentAction)
+                    }
                 }
             }
         }
@@ -160,6 +197,11 @@ internal fun TaskDetailScreenComposable(
 fun AddCommentDialog(onDismissRequest: () -> Unit, onConfirmRequest: (String) -> Unit) {
     var comment: String by rememberSaveable("") {
         mutableStateOf("")
+    }
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
     }
 
     AlertDialog(
@@ -192,7 +234,10 @@ fun AddCommentDialog(onDismissRequest: () -> Unit, onConfirmRequest: (String) ->
                 value = comment,
                 onValueChange = { newComment -> comment = newComment },
                 label = { Text("New comment") },
-                modifier = Modifier.height(150.dp).widthIn(max = 280.dp)
+                modifier = Modifier
+                    .height(150.dp)
+                    .widthIn(max = 280.dp)
+                    .focusRequester(focusRequester)
             )
         },
 //        shape = shape,
@@ -207,7 +252,7 @@ fun AddCommentDialog(onDismissRequest: () -> Unit, onConfirmRequest: (String) ->
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_TYPE_NORMAL, showSystemUi = true)
 fun TaskDetailScreenLightMode() {
     TaskManagerTheme {
-        TaskDetailScreenComposable(getSampleTaskDetailScreen(), {}, {})
+        TaskDetailScreenComposable(rememberNavController(), getSampleTaskDetailScreen(), {}, {}, {})
     }
 }
 
@@ -215,7 +260,7 @@ fun TaskDetailScreenLightMode() {
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES, showSystemUi = true)
 fun TaskDetailScreenNightMode() {
     TaskManagerTheme {
-        TaskDetailScreenComposable(getSampleTaskDetailScreen(), {}, {})
+        TaskDetailScreenComposable(rememberNavController(), getSampleTaskDetailScreen(), {}, {}, {})
     }
 }
 

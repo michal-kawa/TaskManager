@@ -15,8 +15,8 @@ class TestTaskDao : TaskDao {
         flow { emit(tasksList.value.filter { it.id == id }.first()) }
 
 
-    override fun getTaskList(taskStatus: String): Flow<List<TaskEntity>> =
-        flow { emit(tasksList.value.filter { it.taskStatus == taskStatus }) }
+    override fun getTaskList(): Flow<List<TaskEntity>> =
+        flow { emit(tasksList.value) }
 
     override fun updateTask(task: TaskEntity) {
         tasksList.update { tasks ->

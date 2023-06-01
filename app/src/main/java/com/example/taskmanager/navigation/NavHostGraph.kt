@@ -19,13 +19,13 @@ fun SetupNavHostGraph(navController: NavHostController, startDestination: String
             TaskListsScreen(navController)
         }
         composable(route = MainScreen.Add.route) {
-            AddTaskScreen()
+            AddTaskScreen(navController)
         }
         composable(
             route = MainScreen.TaskDetail.route,
             arguments = listOf(navArgument("taskId") { type = NavType.IntType })
         ) {
-            TaskDetailScreen()
+            TaskDetailScreen(navController)
         }
     }
 }
@@ -34,5 +34,5 @@ sealed class MainScreen(val route: String) {
     //    object Splash: Screen("splash_screen")
     object TaskList : MainScreen("task_list_screen")
     object Add : MainScreen("add_task_screen")
-    object TaskDetail : MainScreen("task_screen/{taskId}")
+    object TaskDetail : MainScreen("task_detail_screen/{taskId}")
 }

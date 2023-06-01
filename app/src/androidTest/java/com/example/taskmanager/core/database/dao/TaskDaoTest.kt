@@ -42,7 +42,8 @@ class TaskDaoTest {
         // When
         database.taskDao().insertTask(task)
         val resultTask = taskDao.getTaskById(task.id).first()
-        val resultTasks = taskDao.getTaskList("TODO").first()
+        val resultTasks =
+            taskDao.getTaskList().first().filter { it.taskStatus == TaskStatus.TODO.name }
 
 
         // Then
@@ -57,9 +58,11 @@ class TaskDaoTest {
 
         // When
         database.taskDao().insertTask(task)
-        task = database.taskDao().getTaskList(TaskStatus.TODO.name).first().first()
+        task =
+            database.taskDao().getTaskList().first().first { it.taskStatus == TaskStatus.TODO.name }
         database.taskDao().removeTask(task)
-        val resultTasks = taskDao.getTaskList("TODO").first()
+        val resultTasks =
+            taskDao.getTaskList().first().filter { it.taskStatus == TaskStatus.TODO.name }
 
         // Then
         assertEquals(0, resultTasks.size)
@@ -72,11 +75,11 @@ class TaskDaoTest {
 
         // When
         todoTasks.map { database.taskDao().insertTask(it) }
-        val resultTasks = taskDao.getTaskList(TaskStatus.TODO.name)
+        val resultTasks = taskDao.getTaskList().first().filter { task -> task.taskStatus == TaskStatus.TODO.name }
 
         // Then
-        assertEquals(3, resultTasks.first().size)
-        assertEquals("First todo task title", resultTasks.first().first().title)
+        assertEquals(3, resultTasks.size)
+        assertEquals("First todo task title", resultTasks.first().title)
     }
 
     @Test
@@ -86,11 +89,11 @@ class TaskDaoTest {
 
         // When
         todoTasks.map { database.taskDao().insertTask(it) }
-        val resultTasks = taskDao.getTaskList(TaskStatus.IN_PROGRESS.name)
+        val resultTasks = taskDao.getTaskList().first().filter { task -> task.taskStatus == TaskStatus.IN_PROGRESS.name }
 
         // Then
-        assertEquals(3, resultTasks.first().size)
-        assertEquals("First in progress task title", resultTasks.first().first().title)
+        assertEquals(3, resultTasks.size)
+        assertEquals("First in progress task title", resultTasks.first().title)
     }
 
     @Test
@@ -100,11 +103,11 @@ class TaskDaoTest {
 
         // When
         todoTasks.map { database.taskDao().insertTask(it) }
-        val resultTasks = taskDao.getTaskList(TaskStatus.DONE.name)
+        val resultTasks = taskDao.getTaskList().first().filter { task -> task.taskStatus == TaskStatus.DONE.name }
 
         // Then
-        assertEquals(3, resultTasks.first().size)
-        assertEquals("First done task title", resultTasks.first().first().title)
+        assertEquals(3, resultTasks.size)
+        assertEquals("First done task title", resultTasks.first().title)
     }
 
 

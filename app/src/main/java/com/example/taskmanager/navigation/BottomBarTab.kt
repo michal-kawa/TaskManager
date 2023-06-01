@@ -10,16 +10,16 @@ enum class BottomBarTab(
     TODO(
         icon = R.drawable.todo_icon,
         title = R.string.to_do_navigation_title,
-        route = "todo_screen"
+        route = ListScreen.Todo.route
     ),
     INPROGRESS(
         icon = R.drawable.inprogress_icon,
         title = R.string.in_progress_navigation_title,
-        route = "inprogress_screen"
+        route = ListScreen.Inprogress.route
     ),
     DONE(
         icon = R.drawable.done_icon,
         title = R.string.done_navigation_title,
-        route = "done_screen"
+        route = ListScreen.Done.route
     )
 }

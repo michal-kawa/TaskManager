@@ -6,6 +6,7 @@ import com.example.taskmanager.core.data.testdao.TestTaskDao
 import com.example.taskmanager.core.database.dao.TaskDao
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -43,7 +44,7 @@ class TaskRepositoryTest {
         taskRepository.addTask(task)
 
         // Then
-        val resultTask = taskRepository.getTaskById(0)
+        val resultTask = taskRepository.getTaskById(0).first()
         assertEquals(task, resultTask)
     }
 }

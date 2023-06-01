@@ -2,7 +2,10 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="AddTaskPreview">
+      <entry key="TaskDaoTest">
+        <State />
+      </entry>
+      <entry key="TaskRepositoryTest">
         <State />
       </entry>
       <entry key="app">
