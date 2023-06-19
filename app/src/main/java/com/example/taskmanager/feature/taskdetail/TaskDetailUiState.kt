@@ -7,6 +7,7 @@ data class TaskDetailUiState(
     var task: Task? = null,
     var comments: List<Comment> = emptyList(),
     var selectedComments: List<Comment> = emptyList(),
+    var isEditTaskModeEnabled: Boolean = false
 ) {
     val deleteCommentOption: Boolean
         get() = selectedComments.isNotEmpty()

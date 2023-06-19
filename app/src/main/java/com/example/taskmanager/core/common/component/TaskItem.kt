@@ -28,13 +28,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.taskmanager.core.data.model.Task
 import com.example.taskmanager.core.data.model.TaskStatus
+import com.example.taskmanager.navigation.MainScreen
 import com.example.taskmanager.ui.theme.TaskManagerTheme
 
 @Composable
 fun TaskItem(task: Task, onClick: (String) -> Unit) {
     val normalPadding = 16.dp
     Surface {
-        Column(modifier = Modifier.clickable { onClick("task_detail_screen/" + task.id) },) {
+        Column(modifier = Modifier.clickable { onClick(MainScreen.TaskDetail.createRoute("${task.id}")) }) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -100,7 +101,7 @@ fun TaskItemPreview() {
                 "23.05.2023",
                 TaskStatus.TODO
             ),
-            onClick = {  }
+            onClick = { }
         )
     }
 }
@@ -117,7 +118,7 @@ fun TaskItemPreviewNight() {
                 "23.05.2023",
                 TaskStatus.TODO
             ),
-            onClick = {  }
+            onClick = { }
         )
     }
 }

@@ -63,14 +63,13 @@ fun AddTaskScreen(
         mutableStateOf(false)
     }
 
-    val selectedDate by remember { mutableStateOf("") }
-    var startingDate = LocalDate.now()
+    var taskDate = LocalDate.now()
         .format(DateTimeFormatter.ofPattern(dateFormat))
 
     Scaffold(
         topBar = {
             TaskManagerTopBar(
-                navController = navHostController,
+                topBarTitle = R.string.addTask_topBar_title,
                 navigationIcon = Icons.Default.ArrowBack,
                 navigationIconContentDescription = stringResource(R.string.back_button_description),
                 onNavigationClick = navHostController::popBackStack,
@@ -80,7 +79,7 @@ fun AddTaskScreen(
             FloatingActionButton(onClick = {
                 if (!nameIsEmpty && !descriptionIsEmpty) {
                     viewModel.addNewTask(
-                        Task(0, taskName, taskDescription, startingDate, TaskStatus.TODO)
+                        Task(0, taskName, taskDescription, taskDate, TaskStatus.TODO)
                     )
                     onBackPresserDispatcher?.onBackPressed()
                 }
@@ -132,7 +131,7 @@ fun AddTaskScreen(
             Spacer(modifier = Modifier.height(normalPadding))
 
             InputTextField(
-                value = if (selectedDate == "") startingDate else selectedDate,
+                value = taskDate,
                 labelResource = R.string.addTask_date_field_label,
                 onValueChange = { },
                 modifier = Modifier
@@ -145,7 +144,7 @@ fun AddTaskScreen(
                 DatePickerDialog(
                     onDismissRequest = { isDateDialogShown = false },
                     onDateChange = { date ->
-                        startingDate = date.format(
+                        taskDate = date.format(
                             DateTimeFormatter.ofPattern(dateFormat)
                         )
                         isDateDialogShown = false

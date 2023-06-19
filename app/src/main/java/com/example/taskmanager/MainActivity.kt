@@ -9,12 +9,13 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.taskmanager.navigation.BottomBarTab
 import com.example.taskmanager.navigation.MainScreen
@@ -47,15 +48,14 @@ fun MainScreen() {
 @Composable
 fun TaskNavigationBar(
     navController: NavHostController,
-    backStackEntry: State<NavBackStackEntry?>,
     bottomNavItems: List<BottomBarTab>
 ) {
     NavigationBar {
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentDestination = navBackStackEntry?.destination
         bottomNavItems.forEach { destination ->
-            val selected =
-                destination.route == backStackEntry.value?.destination?.route
             NavigationBarItem(
-                selected = selected,
+                selected = currentDestination?.hierarchy?.any { it.route == destination.route } == true,
                 onClick = { navController.navigate(destination.route) },
                 label = { Text(text = stringResource(id = destination.title)) },
                 icon = {

@@ -3,11 +3,13 @@ package com.example.taskmanager.feature.taskdetail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.taskmanager.core.common.di.IoDispatcher
 import com.example.taskmanager.core.data.model.Comment
+import com.example.taskmanager.core.data.model.Task
 import com.example.taskmanager.core.data.repository.CommentRepository
 import com.example.taskmanager.core.data.repository.TaskRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,6 +23,7 @@ class TaskDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val taskRepository: TaskRepository,
     private val commentRepository: CommentRepository,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private val taskId: Int = checkNotNull(savedStateHandle["taskId"])
@@ -29,13 +32,13 @@ class TaskDetailViewModel @Inject constructor(
     val uiState: StateFlow<TaskDetailUiState> = _uiState.asStateFlow()
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             taskRepository.getTaskById(taskId).collect { task ->
                 _uiState.value = _uiState.value.copy(task = task)
             }
         }
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             commentRepository.getCommentForTask(taskId).collect { comments ->
                 _uiState.value = _uiState.value.copy(comments = comments)
             }
@@ -49,7 +52,7 @@ class TaskDetailViewModel @Inject constructor(
             )
         )
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             commentRepository.addComment(comment)
             _uiState.value = _uiState.value.copy(comments = _uiState.value.comments + comment)
         }
@@ -66,7 +69,7 @@ class TaskDetailViewModel @Inject constructor(
     }
 
     fun removeSelectedComments() {
-        val job = viewModelScope.launch(Dispatchers.IO) {
+        val job = viewModelScope.launch(ioDispatcher) {
             uiState.value.selectedComments.forEach {
                 commentRepository.removeComment(it)
             }

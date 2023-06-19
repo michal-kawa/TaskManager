@@ -10,35 +10,20 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavHostController
-import com.example.taskmanager.R
-import com.example.taskmanager.navigation.MainScreen
+import com.example.taskmanager.utils.ActionTopBarOption
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskManagerTopBar(
-    navController: NavHostController,
-    navigationIcon: ImageVector?,
-    navigationIconContentDescription: String?,
+    topBarTitle: Int,
+    navigationIcon: ImageVector? = null,
+    navigationIconContentDescription: String? = null,
     onNavigationClick: () -> Unit = { },
-    showActionIcon: Boolean = false,
-    actionIcon: ImageVector? = null,
-    actionIconContentDescription: String? = null,
-    onActionClick: () -> Unit = { },
+    actionOptions: List<ActionTopBarOption> = emptyList(),
 
     ) {
     TopAppBar(
-        title = {
-            if (navController.currentBackStackEntry?.destination?.route == MainScreen.Add.route) {
-                Text(
-                    stringResource(R.string.add_new_task_topBar_title)
-                )
-            } else {
-                Text(
-                    stringResource(R.string.lists_topBar_title)
-                )
-            }
-        },
+        title = { Text(stringResource(topBarTitle)) },
         colors = TopAppBarDefaults.smallTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
@@ -50,9 +35,11 @@ fun TaskManagerTopBar(
             }
         },
         actions = {
-            if (showActionIcon) {
-                IconButton(onClick = { onActionClick() }) {
-                    Icon(actionIcon!!, actionIconContentDescription)
+            for (action in actionOptions) {
+                if (action.showActionIcon) {
+                    IconButton(onClick = { action.onActionClick() }) {
+                        Icon(action.actionIcon, action.actionIconContentDescription)
+                    }
                 }
             }
         }

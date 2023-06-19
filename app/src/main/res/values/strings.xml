@@ -10,7 +10,7 @@
     <string name="tasklist_action_move_to">Move to </string>
     <string name="tasklist_action_remove">Remove </string>
     <string name="tasklist_action_icon_description">Action icon</string>
-
+    <string name="tasklist_topBar_title">Task Manager</string>
 
     // AddTaskScreen
     <string name="addTask_title_error_text">Title can\'t be empty</string>
@@ -20,20 +20,27 @@
     <string name="addTask_name_field_label">Name</string>
     <string name="addTask_description_field_label">Description</string>
     <string name="addTask_date_field_label">Date</string>
+    <string name="addTask_topBar_title">Add New Task</string>
 
     // MainActivity
     <string name="navigationBarItem_icon_description">$s icon</string>
     <string name="add_new_task_floating_button_description">Add new task button</string>
     <string name="back_button_description">Back button</string>
     <string name="edit_button_description">Edit button</string>
-    <string name="lists_topBar_title">Task Manager</string>
-    <string name="add_new_task_topBar_title">Add New Task</string>
 
     // TaskDetailScreen
-    <string name="delete_task_action_icon_description">Delete tasks icon</string>
+    <string name="delete_comments_action_icon_description">Delete comments icon</string>
+    <string name="edit_task_action_icon_description">Edit task icon</string>
+    <string name="save_edited_task_action_icon_description">Save edited task icon</string>
+    <string name="taskDetail_topBar_title">Task</string>
+
+    // EditTaskScreen
+    <string name="editTask_topBar_title">Edit Task</string>
 
     // Common
     <string name="date_format">dd.MM.yyyy</string>
     <string name="empty_string" />
+    <string name="ok_button_label">OK</string>
+    <string name="cancel_button_label">Cancel</string>
 
 </resources>

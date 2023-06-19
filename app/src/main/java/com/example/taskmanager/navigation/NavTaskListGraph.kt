@@ -3,6 +3,7 @@ package com.example.taskmanager.navigation
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.taskmanager.feature.tasklists.DoneListScreen
 import com.example.taskmanager.feature.tasklists.InProgressListScreen
@@ -16,9 +17,7 @@ fun SetupNavBottomGraph(
     startDestination: String,
     viewModel: TaskListsViewModel = hiltViewModel()
 ) {
-
-
-    androidx.navigation.compose.NavHost(
+    NavHost(
         navController = navBottomBarController,
         startDestination = startDestination
     ) {

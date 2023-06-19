@@ -1,7 +1,7 @@
 package com.example.taskmanager.feature.taskdetail
 
-import android.R
 import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.ButtonDefaults
@@ -49,12 +50,15 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.taskmanager.R
 import com.example.taskmanager.core.common.component.CommentList
 import com.example.taskmanager.core.common.component.TaskManagerTopBar
 import com.example.taskmanager.core.data.model.Comment
 import com.example.taskmanager.core.data.model.Task
 import com.example.taskmanager.core.data.model.TaskStatus
+import com.example.taskmanager.navigation.MainScreen
 import com.example.taskmanager.ui.theme.TaskManagerTheme
+import com.example.taskmanager.utils.ActionTopBarOption
 
 @Composable
 fun TaskDetailScreen(
@@ -79,7 +83,7 @@ internal fun TaskDetailScreenComposable(
     state: TaskDetailUiState,
     addCommentAction: (String) -> Unit,
     selectCommentAction: (Comment) -> Unit,
-    onActionIconClick: () -> Unit
+    onDeleteCommentActionClick: () -> Unit
 ) {
 
     var isNewCommentDialogShown: Boolean by rememberSaveable {
@@ -89,14 +93,23 @@ internal fun TaskDetailScreenComposable(
     Scaffold(
         topBar = {
             TaskManagerTopBar(
-                navController = navHostController,
+                topBarTitle = R.string.taskDetail_topBar_title,
                 navigationIcon = Icons.Default.ArrowBack,
                 navigationIconContentDescription = stringResource(com.example.taskmanager.R.string.back_button_description),
                 onNavigationClick = navHostController::popBackStack,
-                showActionIcon = state.deleteCommentOption,
-                actionIcon = Icons.Default.Delete,
-                actionIconContentDescription = stringResource(com.example.taskmanager.R.string.delete_task_action_icon_description),
-                onActionClick = onActionIconClick
+                actionOptions = listOf(
+                    ActionTopBarOption(
+                        state.deleteCommentOption,
+                        Icons.Default.Delete,
+                        stringResource(com.example.taskmanager.R.string.delete_comments_action_icon_description),
+                        onDeleteCommentActionClick
+                    ),
+                    ActionTopBarOption(
+                        !state.isEditTaskModeEnabled,
+                        Icons.Default.Edit,
+                        stringResource(com.example.taskmanager.R.string.edit_task_action_icon_description)
+                    ) { navHostController.navigate(MainScreen.EditTask.createRoute("${state.task?.id}")) }
+                )
             )
         }
     ) { paddingValues ->
@@ -110,9 +123,11 @@ internal fun TaskDetailScreenComposable(
                 state.task?.let { task ->
 
                     TextField(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.surface),
                         value = task.title,
-                        onValueChange = {},
+                        onValueChange = { },
                         label = {
                             Text(
                                 "Title", Modifier.padding(horizontal = 4.dp),
@@ -123,9 +138,11 @@ internal fun TaskDetailScreenComposable(
                     )
                     Spacer(Modifier.height(24.dp))
                     TextField(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.surface),
                         value = task.description,
-                        onValueChange = {},
+                        onValueChange = { },
                         label = {
                             Text(
                                 "Description",
@@ -136,7 +153,9 @@ internal fun TaskDetailScreenComposable(
                     )
                     Spacer(Modifier.height(24.dp))
                     TextField(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.surface),
                         value = task.date,
                         onValueChange = {},
                         label = {
@@ -215,16 +234,15 @@ fun AddCommentDialog(onDismissRequest: () -> Unit, onConfirmRequest: (String) ->
                 },
                 enabled = comment.matches(Regex("^.*[^ ].{0,100}\$")),
             ) {
-                Text(stringResource(id = R.string.ok))
+                Text(stringResource(id = R.string.ok_button_label))
             }
         },
-//        modifier = modifier,
         dismissButton = {
             TextButton(
                 colors = ButtonDefaults.textButtonColors(),
                 onClick = { onDismissRequest() },
             ) {
-                Text(stringResource(id = R.string.cancel))
+                Text(stringResource(id = R.string.cancel_button_label))
             }
         },
         title = { Text("Add new comment") },
@@ -252,7 +270,12 @@ fun AddCommentDialog(onDismissRequest: () -> Unit, onConfirmRequest: (String) ->
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_TYPE_NORMAL, showSystemUi = true)
 fun TaskDetailScreenLightMode() {
     TaskManagerTheme {
-        TaskDetailScreenComposable(rememberNavController(), getSampleTaskDetailScreen(), {}, {}, {})
+        TaskDetailScreenComposable(
+            rememberNavController(),
+            getSampleTaskDetailScreen(),
+            {},
+            {},
+            {})
     }
 }
 
@@ -260,7 +283,12 @@ fun TaskDetailScreenLightMode() {
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES, showSystemUi = true)
 fun TaskDetailScreenNightMode() {
     TaskManagerTheme {
-        TaskDetailScreenComposable(rememberNavController(), getSampleTaskDetailScreen(), {}, {}, {})
+        TaskDetailScreenComposable(
+            rememberNavController(),
+            getSampleTaskDetailScreen(),
+            {},
+            {},
+            {})
     }
 }
 
